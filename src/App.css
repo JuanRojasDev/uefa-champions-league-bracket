@@ -1,76 +1,655 @@
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-image: url('./assets/background.jpg');
-  background-size: cover; /* Ensure the image covers the entire background */
-  background-position: center; /* Center the background image */
-  background-repeat: no-repeat; /* Prevent the background image from repeating */
-  height: 100vh; /* Ensure the body takes the full viewport height */
+  padding: 0;
 }
 
-h1 {
-  text-align: center;
-  color: white;
-  margin-top: 20px;
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .App {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  background: #001d3d;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
-.bracket {
-  display: flex;
-  justify-content: space-between;
-  width: 80%;
-  margin-top: 50px;
+/* Header Minimalista */
+.app-header {
+  background: linear-gradient(180deg, rgba(0, 10, 40, 0.98) 0%, rgba(0, 20, 60, 0.95) 100%);
+  border-bottom: 1px solid rgba(0, 212, 248, 0.2);
+  padding: 16px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-.column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-.match {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
-}
-
-.teams {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 20px;
-}
-
-.winner {
-  width: 150px;
-  height: 50px;
-  border: 2px dashed #ccc;
+.header-brand {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
+  gap: 16px;
 }
 
-.match-droppable {
+.header-logo {
+  width: 48px;
+  height: 60px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.header-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Footer Minimalista */
+.app-footer {
+  background: linear-gradient(180deg, rgba(0, 20, 60, 0.95) 0%, rgba(0, 10, 40, 0.98) 100%);
+  border-top: 1px solid rgba(0, 212, 248, 0.2);
+  padding: 12px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
   display: flex;
-  justify-content: space-around;
-  width: 400px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
-.team {
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 5px;
-  padding: 10px;
-  margin: 5px;
-  width: 150px;
+.footer-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: #00d4f8;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+  background: rgba(0, 212, 248, 0.2);
+  transform: translateY(-2px);
+}
+
+.github-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Bracket Container */
+.bracket-export {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.bracket-scale {
+  position: relative;
+}
+
+.bracket-board-responsive {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(2, 6, 41, 0.85), rgba(2, 6, 31, 0.95)),
+    radial-gradient(circle at 50% 54%, rgba(3, 62, 185, 0.6), transparent 35%),
+    radial-gradient(circle at 18% 88%, rgba(0, 91, 255, 0.45), transparent 30%),
+    url('./assets/background.jpg');
+  background-position: center;
+  background-size: cover;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.trophy-wrap-responsive {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 8%;
+  min-width: 80px;
+  max-width: 120px;
+  height: auto;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.final-central-brand {
+  position: relative;
+  z-index: 2;
+  margin-bottom: -6px;
+  padding: 4px 20px;
+  border-radius: 999px;
+  font-size: clamp(0.55rem, 1.1vw, 0.7rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #001041;
+  background: linear-gradient(90deg, #00d4f8 0%, #e8f4ff 50%, #00d4f8 100%);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.trophy-wrap-responsive .trophy {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.7));
+}
+
+.bracket-board::before,
+.bracket-board::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, transparent 0 28%, rgba(155, 174, 255, 0.5) 28.1% 28.35%, transparent 28.45% 100%),
+    linear-gradient(44deg, transparent 0 62%, rgba(67, 202, 255, 0.3) 62.1% 62.32%, transparent 62.42% 100%),
+    linear-gradient(151deg, transparent 0 72%, rgba(255, 255, 255, 0.35) 72.1% 72.25%, transparent 72.35% 100%);
+}
+
+.bracket-board::after {
+  opacity: 0.7;
+  transform: rotate(11deg);
+}
+
+.bracket-title {
+  position: absolute;
+  z-index: 10;
+  top: 30px;
+  left: 50%;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.bracket-title span {
+  font-size: 1.8rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: #ffffff;
+}
+
+.bracket-title strong {
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.8;
+  color: #ffffff;
+}
+
+.team-position,
+.winner-slot,
+.connector,
+.trophy-wrap,
+.legend {
+  position: absolute;
+  z-index: 3;
+}
+
+.team-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  color: #1a1a1a;
+  cursor: grab;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  user-select: none;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.team-card:active {
+  cursor: grabbing;
+}
+
+.team-card.light {
+  background: #dce4e8;
+  border: none;
+}
+
+.team-card.cyan {
+  background: #00d4f8;
+  border: none;
+  color: #000000;
+}
+
+.team-card img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.team-card > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  flex: 1;
+}
+
+.team-position {
+  position: absolute;
+  z-index: 3;
+}
+
+.team-card img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.team-card > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.winner-slot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #3d2a5c;
+  border-radius: 12px;
+  background: #c8d4dc;
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  z-index: 5;
+}
+
+.winner-slot.right {
+  background: #00d4f8;
+  border-color: #0099cc;
+}
+
+.winner-slot.center {
+  background: #c8d4dc;
+  border-color: #3d2a5c;
+}
+
+.winner-slot.champion {
+  z-index: 7;
+  background: linear-gradient(145deg, #f5e6b8 0%, #e8d48e 50%, #d4af37 100%);
+  border: 3px solid #8b6914;
+  box-shadow: 0 4px 18px rgba(184, 134, 11, 0.45);
+}
+
+.campeon-pill {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  min-width: 160px;
+  padding: 6px 28px;
+  border-radius: 999px;
+  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #1a1204;
+  background: linear-gradient(90deg, #c9a227 0%, #f9e4a8 45%, #f9e4a8 55%, #c9a227 100%);
+  border: 2px solid #6b5210;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
   text-align: center;
+}
+
+.winner-team {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slot-team-logo {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.round-badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  background: #2d1b4e;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.round-badge.right,
+.round-badge.center {
+  background: #00d4f8;
+  color: #001041;
+}
+
+.winner-slot::before {
+  content: "";
+  position: absolute;
+  inset: -34px;
+}
+
+.winner-slot.drop-ready {
+  border-color: #00d4f8;
+  box-shadow: 0 0 25px rgba(0, 212, 248, 0.9);
+  transform: scale(1.05);
+}
+
+.slot-label {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  color: #ffffff;
+  background: #2d1b4e;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border: none;
+  z-index: 10;
+}
+
+.winner-slot.right .slot-label,
+.winner-slot.center .slot-label {
+  background: #00d4f8;
+  color: #001041;
+}
+
+.winner-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+  padding: 12px;
+}
+
+.team-logo-circle {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.team-logo-circle img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+}
+
+.team-name-hidden {
+  display: none;
+}
+
+.empty-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  color: rgba(26, 26, 26, 0.4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.connector {
+  width: 88px;
+  border-top: 4px solid currentColor;
+  border-right: 4px solid currentColor;
+  color: #b0bcc5;
+}
+
+.connector.left {
+  border-radius: 0 8px 0 0;
+}
+
+.connector.right {
+  border-right: 0;
+  border-left: 4px solid currentColor;
+  border-radius: 8px 0 0 0;
+  color: #00d4f8;
+}
+
+.connector::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  width: 82px;
+  border-top: 4px dotted currentColor;
+}
+
+.connector.left::after {
+  right: -4px;
+}
+
+.connector.right::after {
+  left: -4px;
+}
+
+.trophy-wrap {
+  left: 540px;
+  top: 260px;
+  width: 110px;
+  height: 156px;
+}
+
+.trophy {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.7));
+}
+
+.legend {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  z-index: 10;
+}
+
+.legend span {
+  width: 70px;
+  border-top: 3px dotted rgba(255, 255, 255, 0.45);
+  box-shadow: 0 7px 0 rgba(0, 212, 248, 0.65);
+}
+
+.board-export-button {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 200px;
+  height: 60px;
+  padding: 0 28px;
+  border: 2px solid rgba(0, 212, 248, 0.9);
+  border-radius: 10px;
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(94, 35, 138, 0.96) 0%, rgba(9, 16, 103, 0.96) 100%);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.board-export-button:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 212, 248, 0.7);
+  border-color: #00d4f8;
+  background: linear-gradient(135deg, rgba(94, 35, 138, 1) 0%, rgba(9, 16, 103, 1) 100%);
+}
+
+.download-icon {
+  position: relative;
+  width: 20px;
+  height: 22px;
+}
+
+.download-icon::before,
+.download-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.download-icon::before {
+  top: 0;
+  width: 3px;
+  height: 14px;
+  background: currentColor;
+  box-shadow: -5px 7px 0 -2px currentColor, 5px 7px 0 -2px currentColor;
+}
+
+.download-icon::after {
+  bottom: 0;
+  width: 20px;
+  height: 8px;
+  border-bottom: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+
+.drag-ghost {
+  position: fixed;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+  height: 60px;
+  padding: 0 16px;
+  color: #001d3d;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  font-weight: 900;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  border: 2px solid rgba(0, 212, 248, 0.6);
+}
+
+.drag-ghost img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .header-title {
+    font-size: 1.4rem;
+  }
+  
+  .header-logo {
+    width: 40px;
+    height: 50px;
+  }
 }

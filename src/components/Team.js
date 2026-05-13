@@ -1,22 +1,20 @@
 import React from 'react';
-import { useDrag } from 'react-dnd';
 
-function Team({ team }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'TEAM',
-    item: { id: team.id },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
+function Team({ team, tone = 'light', onPointerStart }) {
+  const handleDragStart = (event) => {
+    event.dataTransfer.setData('text/plain', team.id);
+    event.dataTransfer.effectAllowed = 'copy';
+  };
 
   return (
     <div
-      ref={drag}
-      className="team"
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className={`team-card ${tone}`}
+      draggable
+      onDragStart={handleDragStart}
+      onPointerDown={(event) => onPointerStart?.(event, team.id)}
     >
-      {team.name}
+      <img crossOrigin="anonymous" src={team.logo} alt="" />
+      <span>{team.name}</span>
     </div>
   );
 }
