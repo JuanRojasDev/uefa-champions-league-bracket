@@ -342,17 +342,19 @@ body,
   position: absolute;
   z-index: 6;
   pointer-events: none;
-  min-width: 160px;
-  padding: 6px 28px;
+  min-width: 200px;
+  padding: 8px 32px;
   border-radius: 999px;
-  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+  font-size: clamp(0.72rem, 1.35vw, 0.9rem);
   font-weight: 900;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.06em;
+  font-family: Arial, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
   color: #1a1204;
   background: linear-gradient(90deg, #c9a227 0%, #f9e4a8 45%, #f9e4a8 55%, #c9a227 100%);
   border: 2px solid #6b5210;
   box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
   text-align: center;
+  white-space: nowrap;
 }
 
 .winner-team {

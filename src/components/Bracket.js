@@ -6,6 +6,9 @@ import backgroundImage from '../assets/background.jpg';
 
 const logoUrl = (clubId) => `https://img.uefa.com/imgml/TP/teams/logos/70x70/${clubId}.png`;
 
+/** Texto de la pastilla bajo el trofeo (web + export PNG) */
+const CAMPEON_PILL_TEXT = '¡CAMPEON! 👑';
+
 const teams = {
   paris: { id: 'paris', name: 'PARIS', initials: 'PSG', logo: logoUrl(52747), colors: ['#004170', '#e30613'] },
   chelsea: { id: 'chelsea', name: 'CHELSEA', initials: 'CHE', logo: logoUrl(52914), colors: ['#034694', '#ffffff'] },
@@ -83,8 +86,6 @@ const initialTeamCards = [
   { id: 'arsenal', side: 'right', pair: 3, position: 1, tone: 'cyan' },
 ];
 
-const connectors = [];
-
 const calculateLayout = (width, height) => {
   const CARD_HEIGHT = 50;
   const CARD_GAP = 8;
@@ -133,12 +134,12 @@ const calculateLayout = (width, height) => {
 
   const trophyDrawW = Math.min(140, SLOT_SIZE * 1.65);
   const trophyDrawH = trophyDrawW * 1.4;
-  const gapBelowTrophy = 10;
-  const campeonPillH = 26;
-  const gapPillToChampionSlot = 10;
+  const gapBelowTrophy = 40;
+  const campeonPillH = 30;
+  const gapPillToChampionSlot = 22;
   const campeonLabelCy = centerY + trophyDrawH / 2 + gapBelowTrophy + campeonPillH / 2;
   const championSlotY =
-    centerY + trophyDrawH / 2 + gapBelowTrophy + campeonPillH + gapPillToChampionSlot - SLOT_SIZE / 2;
+    centerY + trophyDrawH / 2 + gapBelowTrophy + campeonPillH + gapPillToChampionSlot;
 
   const teamCards = initialTeamCards.map(card => ({
     ...card,
@@ -284,10 +285,59 @@ const calculateLayout = (width, height) => {
     }
   });
 
+  const roundBadges = [];
+  slotPositions.forEach((slot) => {
+    if (slot.round === 'champion' || !slot.label) return;
+    let badgeX;
+    let badgeY;
+    if (!slot.sources) {
+      const side = slot.side;
+      const card1 = teamCards.find(
+        (c) => c.side === side && c.pair === slot.row && c.position === 0
+      );
+      const card2 = teamCards.find(
+        (c) => c.side === side && c.pair === slot.row && c.position === 1
+      );
+      if (!card1 || !card2) return;
+      badgeY = (card1.y + card2.y) / 2 + CARD_HEIGHT / 2;
+      const attach = side === 'left' ? card1.x + CARD_WIDTH : card1.x;
+      const vertX =
+        side === 'left'
+          ? (attach + slot.x) / 2
+          : (attach + slot.x + SLOT_SIZE) / 2;
+      badgeX =
+        side === 'left'
+          ? (vertX + slot.x) / 2
+          : (vertX + slot.x + SLOT_SIZE) / 2;
+    } else {
+      const src1 = slotPositions.find((s) => s.id === slot.sources[0]);
+      const src2 = slotPositions.find((s) => s.id === slot.sources[1]);
+      if (!src1 || !src2) return;
+      badgeY = (src1.y + src2.y) / 2 + SLOT_SIZE / 2;
+      if (slot.side === 'left') {
+        const mergeX = src1.x + SLOT_SIZE;
+        badgeX = (mergeX + slot.x) / 2;
+      } else if (slot.side === 'right') {
+        const mergeX = src1.x;
+        badgeX = (mergeX + slot.x + SLOT_SIZE) / 2;
+      } else {
+        badgeX = slot.x + SLOT_SIZE / 2;
+      }
+    }
+    roundBadges.push({
+      slotId: slot.id,
+      x: badgeX,
+      y: badgeY,
+      label: slot.label,
+      side: slot.side,
+    });
+  });
+
   return {
     teamCards,
     slots: slotPositions,
     connectors: calculatedConnectors,
+    roundBadges,
     slotSize: SLOT_SIZE,
     cardWidth: CARD_WIDTH,
     cardHeight: CARD_HEIGHT,
@@ -363,16 +413,6 @@ const drawCrest = (context, team, x, y, width = 36, height = 40) => {
   context.restore();
 };
 
-const drawTeamMark = (context, team, logos, x, y, width, height) => {
-  const logo = logos?.[team.id];
-  if (logo) {
-    context.drawImage(logo, x, y, width, height);
-    return;
-  }
-
-  drawCrest(context, team, x, y, width, height);
-};
-
 const drawTeamCard = (context, card, logos, cardWidth = 180) => {
   const team = teams[card.id];
   const nameMaxW = Math.max(80, cardWidth - 66);
@@ -392,28 +432,6 @@ const drawTeamCard = (context, card, logos, cardWidth = 180) => {
   context.textAlign = 'left';
   context.textBaseline = 'middle';
   context.fillText(team.name, card.x + 54, card.y + 25, nameMaxW);
-};
-
-const drawConnector = (context, [side, x, y, height]) => {
-  context.save();
-  context.strokeStyle = side === 'right' ? '#00d4f8' : '#c8d4d8';
-  context.lineWidth = 3;
-  
-  // Línea vertical sólida
-  context.beginPath();
-  context.moveTo(x, y);
-  context.lineTo(side === 'right' ? x - 74 : x + 74, y);
-  context.lineTo(side === 'right' ? x - 74 : x + 74, y + height);
-  context.stroke();
-  
-  // Línea horizontal punteada
-  context.setLineDash([6, 8]);
-  context.lineCap = 'round';
-  context.beginPath();
-  context.moveTo(side === 'right' ? x - 74 : x + 74, y + height + 10);
-  context.lineTo(side === 'right' ? x : x + 148, y + height + 10);
-  context.stroke();
-  context.restore();
 };
 
 const drawSlot = (context, slot, picks, logos, slotSize = 110) => {
@@ -441,21 +459,6 @@ const drawSlot = (context, slot, picks, logos, slotSize = 110) => {
   context.shadowColor = 'transparent';
   context.shadowBlur = 0;
 
-  if (slot.label) {
-    const labelBg = slot.side === 'right' || slot.side === 'center' ? '#00d4f8' : '#4a2c6b';
-    const labelColor = slot.side === 'right' || slot.side === 'center' ? '#001041' : '#ffffff';
-    context.fillStyle = labelBg;
-    context.beginPath();
-    context.roundRect(slot.x - 72, slot.y + height / 2 - 16, 60, 32, 16);
-    context.fill();
-
-    context.fillStyle = labelColor;
-    context.font = '900 13px Arial';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(slot.label, slot.x - 42, slot.y + height / 2);
-  }
-
   if (selectedTeam) {
     const logo = logos?.[selectedTeam.id];
     if (logo) {
@@ -467,9 +470,35 @@ const drawSlot = (context, slot, picks, logos, slotSize = 110) => {
     context.font = '900 11px Arial'; // Texto más pequeño
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillText('ARRASTRA', slot.x + width / 2, slot.y + height / 2 - 8);
-    context.fillText('AQUI', slot.x + width / 2, slot.y + height / 2 + 10);
+    context.font = '900 11px Arial';
+    context.fillText('ARRASTRA AQUI', slot.x + width / 2, slot.y + height / 2);
   }
+};
+
+const drawRoundBadgeCanvas = (context, badge) => {
+  const padX = 14;
+  const h = 26;
+  context.save();
+  context.font = '900 13px Arial';
+  const tw = context.measureText(badge.label).width;
+  const w = Math.max(48, tw + padX * 2);
+  const x = badge.x - w / 2;
+  const y = badge.y - h / 2;
+  const isCyan = badge.side === 'right' || badge.side === 'center';
+  context.fillStyle = isCyan ? '#00d4f8' : '#2d1b4e';
+  context.shadowColor = 'rgba(0, 0, 0, 0.4)';
+  context.shadowBlur = 6;
+  context.shadowOffsetY = 2;
+  context.beginPath();
+  context.roundRect(x, y, w, h, h / 2);
+  context.fill();
+  context.shadowColor = 'transparent';
+  context.shadowBlur = 0;
+  context.fillStyle = isCyan ? '#001041' : '#ffffff';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(badge.label, badge.x, badge.y);
+  context.restore();
 };
 
 const exportCanvasPng = async (picks, layout) => {
@@ -505,12 +534,25 @@ const exportCanvasPng = async (picks, layout) => {
   context.fillStyle = glow;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
+  const titleY = Math.max(48, canvas.height * 0.085);
+  const cx = canvasLayout.centerX;
+  const roadSize = Math.max(22, canvas.height * 0.038);
+  const budSize = Math.max(36, canvas.height * 0.058);
+  const titleGap = Math.max(12, canvas.height * 0.014);
+  context.textBaseline = 'alphabetic';
   context.fillStyle = '#ffffff';
-  context.font = '500 32px Arial';
-  context.textAlign = 'center';
-  context.fillText('R O A D   T O', canvas.width/2 - 100, 80);
-  context.font = '900 50px Brush Script MT, Segoe Script, cursive';
-  context.fillText('BUDAPEST 26', canvas.width/2 + 100, 80);
+  context.font = `500 ${roadSize}px Arial`;
+  const roadW = context.measureText('ROAD TO').width;
+  context.font = `900 ${budSize}px "Brush Script MT", "Segoe Script", cursive`;
+  const budW = context.measureText('BUDAPEST 26').width;
+  const titleTotal = roadW + titleGap + budW;
+  let titleX = cx - titleTotal / 2;
+  context.font = `500 ${roadSize}px Arial`;
+  context.textAlign = 'left';
+  context.fillText('ROAD TO', titleX, titleY);
+  titleX += roadW + titleGap;
+  context.font = `900 ${budSize}px "Brush Script MT", "Segoe Script", cursive`;
+  context.fillText('BUDAPEST 26', titleX, titleY);
 
   // Dibujar conectores
   canvasLayout.connectors.forEach((conn) => {
@@ -542,8 +584,13 @@ const exportCanvasPng = async (picks, layout) => {
   );
 
   context.save();
-  const pillW = 200;
-  const pillH = 28;
+  const pillH = 32;
+  context.textAlign = 'left';
+  context.textBaseline = 'middle';
+  context.font =
+    '900 15px Arial, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+  const labelW = context.measureText(CAMPEON_PILL_TEXT).width;
+  const pillW = Math.max(240, labelW + 40);
   const px = canvasLayout.centerX - pillW / 2;
   const py = canvasLayout.campeonLabelCy - pillH / 2;
   const grad = context.createLinearGradient(px, py, px + pillW, py + pillH);
@@ -552,20 +599,20 @@ const exportCanvasPng = async (picks, layout) => {
   grad.addColorStop(1, '#d4af37');
   context.fillStyle = grad;
   context.beginPath();
-  context.roundRect(px, py, pillW, pillH, 14);
+  context.roundRect(px, py, pillW, pillH, pillH / 2);
   context.fill();
   context.strokeStyle = '#8b6914';
   context.lineWidth = 2;
   context.stroke();
   context.fillStyle = '#1a1204';
-  context.font = '900 14px Arial';
   context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.fillText('CAMPEON', canvasLayout.centerX, canvasLayout.campeonLabelCy);
+  context.fillText(CAMPEON_PILL_TEXT, canvasLayout.centerX, canvasLayout.campeonLabelCy);
   context.restore();
 
   const champ = canvasLayout.slots.find((s) => s.id === 'champion');
   if (champ) drawSlot(context, champ, picks, logos, canvasLayout.slotSize);
+
+  (canvasLayout.roundBadges || []).forEach((b) => drawRoundBadgeCanvas(context, b));
 
   // Dibujar leyenda
   context.strokeStyle = '#e7f2f5';
@@ -737,53 +784,15 @@ const Bracket = forwardRef(function Bracket({ onExporterReady }, ref) {
           ))}
         </svg>
 
-        {/* Badges QF/R16/SF */}
-        {layout.slots
-          .filter((slot) => slot.round !== 'champion')
-          .map((slot) => {
-          let badgeX, badgeY;
-          if (!slot.sources) {
-            // R16: badge en el vertX (mitad del gap entre tarjeta y slot)
-            const side = slot.side;
-            const card1 = layout.teamCards.find(c => c.side === side && c.pair === slot.row && c.position === 0);
-            const card2 = layout.teamCards.find(c => c.side === side && c.pair === slot.row && c.position === 1);
-            if (card1 && card2) {
-              badgeY = (card1.y + card2.y) / 2 + layout.cardHeight / 2;
-              const attach = side === 'left' ? card1.x + layout.cardWidth : card1.x;
-              const vertX = side === 'left'
-                ? (attach + slot.x) / 2
-                : (attach + slot.x + layout.slotSize) / 2;
-              badgeX = side === 'left'
-                ? (vertX + slot.x) / 2
-                : (vertX + slot.x + layout.slotSize) / 2;
-            } else {
-              badgeX = slot.x; badgeY = slot.y + layout.slotSize / 2;
-            }
-          } else {
-            const src1 = layout.slots.find(s => s.id === slot.sources[0]);
-            const src2 = layout.slots.find(s => s.id === slot.sources[1]);
-            if (src1 && src2) {
-              badgeY = (src1.y + src2.y) / 2 + layout.slotSize / 2;
-              if (slot.side === 'left') {
-                const mergeX = src1.x + layout.slotSize;
-                badgeX = (mergeX + slot.x) / 2;
-              } else if (slot.side === 'right') {
-                const mergeX = src1.x;
-                badgeX = (mergeX + slot.x + layout.slotSize) / 2;
-              } else {
-                badgeX = slot.x + layout.slotSize / 2;
-              }
-            } else {
-              badgeX = slot.x; badgeY = slot.y + layout.slotSize / 2;
-            }
-          }
-          return (
-            <div key={`badge-${slot.id}`} className={`round-badge ${slot.side}`}
-              style={{ left: badgeX, top: badgeY, transform: 'translate(-50%, -50%)' }}>
-              {slot.label}
-            </div>
-          );
-        })}
+        {(layout.roundBadges || []).map((b) => (
+          <div
+            key={`badge-${b.slotId}`}
+            className={`round-badge ${b.side}`}
+            style={{ left: b.x, top: b.y, transform: 'translate(-50%, -50%)' }}
+          >
+            {b.label}
+          </div>
+        ))}
 
         {/* Tarjetas de equipos */}
         {layout.teamCards.map((card) => (
@@ -826,7 +835,7 @@ const Bracket = forwardRef(function Bracket({ onExporterReady }, ref) {
             transform: 'translate(-50%, -50%)',
           }}
         >
-          CAMPEON
+          {CAMPEON_PILL_TEXT}
         </div>
 
         {layout.slots
