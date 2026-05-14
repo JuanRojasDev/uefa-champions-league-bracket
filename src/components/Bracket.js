@@ -7,7 +7,8 @@ import backgroundImage from '../assets/background.jpg';
 const logoUrl = (clubId) => `https://img.uefa.com/imgml/TP/teams/logos/70x70/${clubId}.png`;
 
 /** Texto de la pastilla bajo el trofeo (web + export PNG) */
-const CAMPEON_PILL_TEXT = '¡CAMPEON! 👑';
+const CAMPEON_PILL_TEXT = '¡CAMPEON!';
+const CAMPEON_CROWN_TEXT = '👑';
 
 const teams = {
   paris: { id: 'paris', name: 'PARIS', initials: 'PSG', logo: logoUrl(52747), colors: ['#004170', '#e30613'] },
@@ -132,14 +133,20 @@ const calculateLayout = (width, height) => {
 
   const slotColumns = { 0: L_R16, 1: L_QF, 2: L_SF, 3: FINAL, 4: R_SF, 5: R_QF, 6: R_R16 };
 
-  const trophyDrawW = Math.min(140, SLOT_SIZE * 1.65);
+  const trophyCenterY = centerY - Math.min(42, height * 0.075);
+  const trophyDrawW = Math.min(112, SLOT_SIZE * 1.45);
   const trophyDrawH = trophyDrawW * 1.4;
-  const gapBelowTrophy = 40;
-  const campeonPillH = 30;
-  const gapPillToChampionSlot = 22;
-  const campeonLabelCy = centerY + trophyDrawH / 2 + gapBelowTrophy + campeonPillH / 2;
-  const championSlotY =
-    centerY + trophyDrawH / 2 + gapBelowTrophy + campeonPillH + gapPillToChampionSlot;
+  const gapBelowTrophy = 44;
+  const campeonPillH = 40;
+  const gapPillToChampionSlot = 10;
+  const exportButtonTop = height - 20 - 60;
+  const naturalCampeonLabelCy = trophyCenterY + trophyDrawH / 2 + gapBelowTrophy + campeonPillH / 2;
+  const naturalChampionSlotY = naturalCampeonLabelCy + campeonPillH / 2 + gapPillToChampionSlot;
+  const championSlotY = Math.min(naturalChampionSlotY, exportButtonTop - 16 - SLOT_SIZE);
+  const campeonLabelCy = Math.min(
+    naturalCampeonLabelCy,
+    championSlotY - gapPillToChampionSlot - campeonPillH / 2
+  );
 
   const teamCards = initialTeamCards.map(card => ({
     ...card,
@@ -342,7 +349,7 @@ const calculateLayout = (width, height) => {
     cardWidth: CARD_WIDTH,
     cardHeight: CARD_HEIGHT,
     centerX,
-    centerY,
+    centerY: trophyCenterY,
     sfBandCenterY,
     boardWidth: width,
     boardHeight: height,
@@ -551,7 +558,7 @@ const exportCanvasPng = async (picks, layout) => {
   );
 
   context.save();
-  const pillH = 32;
+  const pillH = 40;
   context.textAlign = 'left';
   context.textBaseline = 'middle';
   context.font =
@@ -573,7 +580,11 @@ const exportCanvasPng = async (picks, layout) => {
   context.stroke();
   context.fillStyle = '#1a1204';
   context.textAlign = 'center';
-  context.fillText(CAMPEON_PILL_TEXT, canvasLayout.centerX, canvasLayout.campeonLabelCy);
+  context.font =
+    '900 15px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", Arial, sans-serif';
+  context.fillText(CAMPEON_CROWN_TEXT, canvasLayout.centerX, canvasLayout.campeonLabelCy - 8);
+  context.font = '900 15px Arial, sans-serif';
+  context.fillText(CAMPEON_PILL_TEXT, canvasLayout.centerX, canvasLayout.campeonLabelCy + 8);
   context.restore();
 
   const champ = canvasLayout.slots.find((s) => s.id === 'champion');
@@ -802,7 +813,8 @@ const Bracket = forwardRef(function Bracket({ onExporterReady }, ref) {
             transform: 'translate(-50%, -50%)',
           }}
         >
-          {CAMPEON_PILL_TEXT}
+          <span className="campeon-crown" aria-hidden="true">{CAMPEON_CROWN_TEXT}</span>
+          <span>{CAMPEON_PILL_TEXT}</span>
         </div>
 
         {layout.slots

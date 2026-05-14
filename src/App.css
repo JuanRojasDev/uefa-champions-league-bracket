@@ -340,13 +340,20 @@ body,
 
 .campeon-pill {
   position: absolute;
-  z-index: 6;
+  z-index: 8;
   pointer-events: none;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
   min-width: 200px;
-  padding: 8px 32px;
+  min-height: 40px;
+  padding: 4px 32px 6px;
   border-radius: 999px;
   font-size: clamp(0.72rem, 1.35vw, 0.9rem);
   font-weight: 900;
+  line-height: 1;
   letter-spacing: 0.06em;
   font-family: Arial, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
   color: #1a1204;
@@ -355,6 +362,12 @@ body,
   box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
   text-align: center;
   white-space: nowrap;
+}
+
+.campeon-crown {
+  font-size: 0.9em;
+  line-height: 0.85;
+  letter-spacing: 0;
 }
 
 .winner-team {
@@ -537,7 +550,7 @@ body,
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 20px;
+  bottom: 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -546,7 +559,7 @@ body,
   font-weight: 900;
   letter-spacing: 0.05em;
   color: #ffffff;
-  z-index: 10;
+  z-index: 9;
 }
 
 .legend span {
@@ -557,7 +570,7 @@ body,
 
 .board-export-button {
   position: absolute;
-  z-index: 5;
+  z-index: 10;
   left: 50%;
   bottom: 20px;
   transform: translateX(-50%);
@@ -578,6 +591,7 @@ body,
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
