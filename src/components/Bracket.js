@@ -380,39 +380,6 @@ const drawCoverImage = (context, image, width, height) => {
   context.drawImage(image, x, y, image.width * scale, image.height * scale);
 };
 
-const drawCrest = (context, team, x, y, width = 36, height = 40) => {
-  context.save();
-  context.beginPath();
-  context.moveTo(x + width / 2, y);
-  context.lineTo(x + width * 0.94, y + height * 0.14);
-  context.lineTo(x + width * 0.88, y + height * 0.72);
-  context.lineTo(x + width / 2, y + height);
-  context.lineTo(x + width * 0.12, y + height * 0.72);
-  context.lineTo(x + width * 0.06, y + height * 0.14);
-  context.closePath();
-  context.clip();
-
-  const gradient = context.createLinearGradient(x, y, x + width, y + height);
-  gradient.addColorStop(0, team.colors[0]);
-  gradient.addColorStop(0.5, team.colors[0]);
-  gradient.addColorStop(0.5, team.colors[1]);
-  gradient.addColorStop(1, team.colors[1]);
-  context.fillStyle = gradient;
-  context.fillRect(x, y, width, height);
-
-  context.strokeStyle = 'rgba(255,255,255,0.95)';
-  context.lineWidth = 3;
-  context.stroke();
-  context.fillStyle = '#ffffff';
-  context.font = `900 ${Math.max(10, width * 0.2)}px Arial`;
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.shadowColor = 'rgba(0,0,0,0.75)';
-  context.shadowBlur = 3;
-  context.fillText(team.initials, x + width / 2, y + height * 0.52);
-  context.restore();
-};
-
 const drawTeamCard = (context, card, logos, cardWidth = 180) => {
   const team = teams[card.id];
   const nameMaxW = Math.max(80, cardWidth - 66);
